@@ -1,0 +1,668 @@
+<!DOCTYPE html> 
+<html manifest='cache.manifest' style='background-image:url(css/images/backgroundmap.jpg);background-size: cover;'>
+<head> 
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	
+	<script type="text/javascript" src="detector.js"></script>
+	
+	<link rel="stylesheet" href="css/jquery.mobile-1.3.1.css" />
+	<script type="text/javascript" src="js/jquery-1.11.1.js"></script>
+	<script type="text/javascript" src="js/jquery-1.6.1.min.js"></script>
+	<script type="text/javascript" src="js/jquery.mobile-1.3.1.min.js"></script>
+
+	<script type="text/javascript" src="js/simple-inheritance.min.js"></script>
+	<script type="text/javascript" src="js/jquery.animate-enhanced.min.js"></script>
+	<script type="text/javascript" src="js/code-photoswipe-jQuery-1.0.11.min.js"></script>
+	
+	<script type="text/javascript" src="js/jquery.modaldialog.js"></script>
+	<script type="text/javascript" src="js/prettify.js"></script>
+	
+	<script type="text/javascript" src="js/jssor.slider.min.js"></script>
+
+
+	<link rel="stylesheet" href="css/jquery.modaldialog.css" />
+	<link rel="stylesheet" href="css/prettify.css" />
+	
+	
+	<link href="css/photoswipe.css" type="text/css" rel="stylesheet" />
+		
+	<style type="text/css">
+		div.gallery-row:after { clear: both; content: "."; display: block; height: 0; visibility: hidden; }
+		div.gallery-item { float: left; width: 33.333333%; }
+		div.gallery-item a { display: block; margin: 5px; border: 1px solid #3c3c3c; }
+		div.gallery-item img { display: block; width: 100%; height: auto; }
+		#Gallery1 .ui-content, #Gallery2 .ui-content { overflow: hidden; }
+	</style>
+	
+	<style>
+		#loadingOverlay {
+			position: fixed;
+			left: 0;
+			top: 0;
+			bottom: 0;
+			right: 0;
+			background: #000;
+			opacity: 0.5;
+			filter: alpha(opacity=50);
+			z-index: 10000000000000;
+		}
+		#loadingGif {
+			width: 50px;
+			height: 50px;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			margin: -28px 0 0 -25px;
+			opacity: 0.99;
+			filter: alpha(opacity=99);
+		}
+		#loadingText {
+			color: white;
+			position: absolute;
+			top: 45%;
+			left: 50%;
+			margin: -28px 0 0 -25px;
+			opacity: 0.99;
+		}
+	</style>
+	
+	<script type='text/javascript'>
+		var tempImage = document.createElement('img');
+		var popuptempImage = document.createElement('img');
+		tempImage.className = 'oldImage';
+		popuptempImage.className = 'popupoldImage';
+		
+		var loading;
+		
+		$(function addLoadingOverlay() 
+		{
+			loading = function() 
+			{
+				// add the overlay with loading image to the page
+				var overlay = '<div id="loadingOverlay">' 
+				+ '<p id="loadingText">Loading...</p>'
+				+ '<img id="loadingGif" src="css/images/loader.gif">' 
+				+ '</div>';
+				
+				$(overlay).appendTo('body');
+				
+				/*
+				// click on the overlay to remove it
+				$('#loadingOverlay').click(function() {
+					$(this).remove();
+				});
+				*/
+			};
+			
+			//$('a').click(loading);	//clicking any link opens the overlay
+			//$('a').bind('click', loading);	//clicking any link opens the overlay
+			$('.toLoad').bind('click', loading);	//clicking any link with toLoad class opens the overlay
+				
+						
+			$('body').bind("pagechange", function(toPage, ui) 
+			{
+				$('#loadingOverlay').remove();
+			});
+			
+			$('body').bind("pagebeforeshow", function()
+			{
+				loading();
+				$('body').bind("pageshow", function()
+				{
+					$('#loadingOverlay').remove();
+				});
+			});
+
+		});
+	</script>
+	
+	<style>
+			.ui-icon-fontIncrease {
+                background: url(css/images/icons-png/search-plus.png) 50% 50% no-repeat;
+                background-size: 80%;
+                box-shadow: none;
+                -webkit-box-shadow: none;
+                margin: auto;
+				background-color: #290808;	
+            }
+			
+			.ui-icon-fontDecrease {
+                background: url(css/images/icons-png/search-minus.png) 50% 50% no-repeat;
+                background-size: 80%;
+                box-shadow: none;
+                -webkit-box-shadow: none;
+                margin: auto;
+				background-color: #290808;	
+            }
+	
+            .ui-icon-eye {
+                background: url(css/images/icons-png/eye-white.png) 50% 50% no-repeat;
+                background-size: 80%;
+                box-shadow: none;
+                -webkit-box-shadow: none;
+                margin: auto;
+				background-color: #290808;	
+            }
+			
+			.ui-icon-3D {
+                background: url(css/images/icons-png/grid-white.png) 50% 50% no-repeat;
+                background-size: 80%;
+                box-shadow: none;
+                -webkit-box-shadow: none;
+                margin: auto;
+				background-color: #290808;	
+            }
+			
+			.ui-icon-video3 {
+                background: url(css/images/icons-png/video-white.png) 50% 50% no-repeat;
+                background-size: 80%;
+                box-shadow: none;
+                -webkit-box-shadow: none;
+                margin: auto;
+				background-color: #290808;	
+            }
+			
+			.ui-icon-audio3 {
+                background: url(css/images/icons-png/audio-white.png) 50% 50% no-repeat;
+                background-size: 80%;
+                box-shadow: none;
+                -webkit-box-shadow: none;
+                margin: auto;
+				background-color: #290808;
+            }
+			
+			.ui-icon-video2 {
+                background: url(css/images/icons-png/video-white.png) no-repeat;
+                background-size: 90%;
+                width: 25px;
+                height: 25px;
+                box-shadow: none;
+                -webkit-box-shadow: none;
+                margin: auto;
+				background-color: #3b0b0b;				
+            }
+			
+			.ui-icon-audio2 {
+                background: url(css/images/icons-png/audio-white.png) no-repeat;
+                background-size: 90%;
+                width: 25px;
+                height: 25px;
+                box-shadow: none;
+                -webkit-box-shadow: none;
+                margin: auto;
+				background-color: #3b0b0b;
+            }
+			
+			.ui-icon-video {
+                background: url(css/images/icons-png/video-white.png) 50% 50% no-repeat;
+                background-size: 80%;
+                box-shadow: none;
+                -webkit-box-shadow: none;
+                margin: auto;
+				background-color: #858585;	
+            }
+			
+			.ui-icon-audio {
+                background: url(css/images/icons-png/audio-white.png) 50% 50% no-repeat;
+                background-size: 80%;
+                box-shadow: none;
+                -webkit-box-shadow: none;
+                margin: auto;
+				background-color: #858585;
+            }
+			
+			.ui-icon-camera {
+                background: url(css/images/icons-png/camera-white.png) 50% 50% no-repeat;
+                background-size: 80%;
+                box-shadow: none;
+                -webkit-box-shadow: none;
+                margin: auto;
+				background-color: #858585;
+            }
+			
+			.ui-icon-location {
+                background: url(css/images/icons-png/location-white.png) 50% 50% no-repeat;
+                background-size: 80%;
+                box-shadow: none;
+                -webkit-box-shadow: none;
+                margin: auto;
+				background-color: #858585;
+            }
+			
+			.ui-icon-location2 {
+                background: url(css/images/icons-png/location-white.png) 50% 50% no-repeat;
+                background-size: 80%;
+                box-shadow: none;
+                -webkit-box-shadow: none;
+                margin: auto;
+				background-color: #290808;
+            }
+			
+			.ui-icon-navigation {
+                background: url(css/images/icons-png/navigation-white.png) 50% 50% no-repeat;
+                background-size: 80%;
+                box-shadow: none;
+                -webkit-box-shadow: none;
+                margin: auto;
+				background-color: #290808;	
+            }
+			
+			.ui-icon-phone {
+                background: url(css/images/icons-png/phone-white.png) 50% 50% no-repeat;
+                background-size: 80%;
+                box-shadow: none;
+                -webkit-box-shadow: none;
+                margin: auto;
+				background-color: #290808;	
+            }
+     </style>
+	
+	<title>[[App Name]] | Sites</title> 
+</head> 
+
+<body style='background-image:url(css/images/scroll.jpg);background-size: 100% 100%;'> 
+
+<div style='background-image:url(css/images/scroll.jpg);background-size: 100% 100%; position:fixed; z-index: -999; bottom: 0%; left: 0; width: 100%; height: 100%;'>
+	<div style="position:relative;top:40%;" align='center'>
+		<img align="center" src="css/images/loader.gif" alt=" " height="60" width="60" style="margin:auto;display:block;vertical-align:middle;">
+	</div>
+</div>
+
+<div data-role="page" style='overflow:hidden; background-image:url(css/images/scroll.jpg);background-size: 100% 100%;' id="trailPointsPage" data-dom-cache='false'>
+
+<script>
+		window.onload = function()
+		{
+			$("[data-position='fixed']").fixedtoolbar('hide');
+		}
+		
+		document.addEventListener('play', function(e)
+		{
+			var audios = document.getElementsByTagName('audio');
+			for(var i = 0, len = audios.length; i < len;i++)
+			{
+				if(audios[i] != e.target)
+				{
+					audios[i].pause();
+				}
+			}
+		}, true);
+		
+		
+		function playAudio(audioId)
+		{
+			var audio = document.getElementById(audioId);
+			audio.play();
+		}
+		
+		function pauseAudio(audioId)
+		{
+			var audio = document.getElementById(audioId);
+			audio.pause();
+		}
+		
+		function videoFullScreen(videoId)
+		{
+			
+			var video = document.getElementById(videoId);
+			video.load();
+			
+			if (video.requestFullscreen) 
+			{
+				video.requestFullscreen();
+				video.addEventListener('fullscreenchange', function()
+				{
+					if(!document.fullscreen)
+						video.pause();
+				});
+			} 
+			else if (video.msRequestFullscreen) 
+			{
+				video.msRequestFullscreen();
+				video.addEventListener('msfullscreenChange', function()
+				{
+					if(!document.msFullscreenElement)
+						video.pause();
+				});
+			} 
+			else if (video.mozRequestFullScreen) 
+			{
+				video.mozRequestFullScreen();
+				video.addEventListener('mozfullscreenchange', function()
+				{
+					if(!document.mozFullScreen)
+						video.pause();
+				});
+			} 
+			else if (video.webkitRequestFullscreen) 
+			{
+				video.webkitRequestFullscreen();
+				video.addEventListener('webkitfullscreenchange', function()
+				{	
+					if(!document.webkitIsFullScreen)
+						video.pause();
+				});
+			}
+			
+			video.play();
+		
+		}
+		
+		function changeFontSize(inc)
+		{	
+			var isChanged='false';
+			var p = document.getElementsByTagName('h4');
+			for(n=0; n<p.length; n++) 
+			{
+				if(p[n].style.fontSize) 
+				{
+					var size = p[n].style.fontSize;
+				} 
+				
+				else 
+				{
+					var size = 'medium';
+				}
+				
+				if(inc>0)
+				{
+					if(size=='small')
+					{
+						p[n].style.fontSize = 'medium';
+						isChanged='true';
+					}
+						
+					else if(size=='medium')
+					{
+						p[n].style.fontSize = 'large';
+						isChanged='true';
+					}
+						
+					else if(size=='large')
+					{
+						p[n].style.fontSize = 'x-large';
+						isChanged='true';
+					}
+					
+					else if(size=='x-large')
+					{
+						p[n].style.fontSize = 'xx-large';
+						isChanged='true';
+					}
+					
+					else if(size=='xx-large')
+					{
+						$.modaldialog.prompt('Max font-size!', {
+							timeout: 3
+							, showClose: false
+							});
+						
+						break;
+					}
+				}
+				
+				else
+				{
+					if(size=='xx-large')
+					{
+						p[n].style.fontSize = 'x-large';
+						isChanged='true';
+					}
+					
+					else if(size=='x-large')
+					{
+						p[n].style.fontSize = 'large';
+						isChanged='true';
+					}
+					
+					else if(size=='large')
+					{
+						p[n].style.fontSize = 'medium';
+						isChanged='true';
+					}
+					
+					else if(size=='medium')
+					{
+						p[n].style.fontSize = 'small';
+						isChanged='true';
+					}
+						
+					else if(size=='small')
+					{						
+						$.modaldialog.prompt('Min font-size!', {
+							timeout: 3
+							, showClose: false
+							});
+							
+						break;
+					}
+				}
+			}
+		}
+		
+		function resizeImageholders()
+		{
+			var windowOrientation="";
+			var imageholderWidth = window.innerWidth*0.8 || document.body.clientWidth*0.8;
+			var imageholderHeight = window.innerHeight*0.5 || document.body.clientHeight*0.5;
+			
+			switch(window.orientation)
+			{
+				case -90:
+				case 90:
+					windowOrientation = "landscape";
+					break;
+				default:
+					windowOrientation = "portrait";
+					break;
+			}
+			
+			
+			if (windowOrientation=="landscape")
+			{
+				imageholderWidth = window.innerWidth*0.8 || document.body.clientWidth*0.8;
+				imageholderHeight = window.innerHeight*0.75 || document.body.clientHeight*0.75;
+			}
+			
+			else if (windowOrientation=="portrait")
+			{
+				imageholderWidth = window.innerWidth*0.8 || document.body.clientWidth*0.8;
+				imageholderHeight = window.innerHeight*0.5 || document.body.clientHeight*0.5;
+			}
+			
+			var images = document.getElementsByClassName('imageholder');
+		    var i = images.length;
+
+		    while(i--) 
+		    {
+		        images[i].style.width = imageholderWidth+"px";
+		        images[i].style.height = imageholderHeight+"px";
+		    }
+		    
+		}
+	
+		$(document).ready(function ()
+		{
+			$('div.gallery-page').live('pageshow', function(e)
+			{
+				$("div.gallery a", e.target).photoSwipe();
+				return true;	
+			})
+		});
+		
+		function getTrailPoints()
+		{
+			if(window.localStorage.getItem("siteUrl")!=null)	
+			{
+				if (window.localStorage.getItem("trailpointsData")!=null)
+				{
+					$('#trailListings').css({visibility:'hidden'});
+					$('#trailListings').css({opacity: 0.0});
+					
+					var storedData = JSON.parse(window.localStorage.getItem("trailpointsData"));
+					
+					$('#trailPointsPage').after(storedData.pages);
+							 					
+					var siteUrlToGo = window.localStorage.getItem("siteUrl");
+					window.localStorage.removeItem("siteUrl");
+					window.location.href=siteUrlToGo;
+					
+					setTimeout(function()
+					{
+						$('#trailListings').html(storedData.listings);
+						$('#trailListings').trigger('create');
+						$('#trailListings').css({visibility:'visible', opacity: 0.0}).animate({opacity: 1.0});
+					}, 1000);
+				}
+						
+				else
+				{
+					$.modaldialog.error("No sites available!");
+					var mapErrorMessage = "<div style='position:relative;top:35%;' align='center'> <h3 align='center' style='text-align:center;align:center;color:#3B0B0B;'>No contents available</h3> <img src='css/images/error.png' alt='Error' height='60' width='60' style='margin:auto;display:block;vertical-align:middle;'><a href='#' style='width:100px;margin:auto;display:block;vertical-align:middle;align:center;' align='center' data-role='button' data-mini='true' data-inline='true' onclick='getPointsAgain();'>Reload sites</a></div>";
+					$('#trailListings').html(mapErrorMessage);
+					$('#trailListings').trigger('create');
+				}
+			}
+			
+			else if(window.localStorage.getItem("panoramaNavigation")!=null)
+			{
+				if (window.localStorage.getItem("trailpointsData")!=null)
+				{
+					$('#trailListings').css({visibility:'hidden'});
+					$('#trailListings').css({opacity: 0.0});
+			
+					var storedData = JSON.parse(window.localStorage.getItem("trailpointsData"));
+
+					$('#trailPointsPage').after(storedData.pages);
+							 					
+					var siteUrlToGo = window.localStorage.getItem("panoramaNavigation");
+					window.localStorage.removeItem("panoramaNavigation");
+					window.location.href=siteUrlToGo;
+					
+					setTimeout(function()
+					{
+						$('#trailListings').html(storedData.listings);
+						$('#trailListings').trigger('create');
+						$('#trailListings').css({visibility:'visible', opacity: 0.0}).animate({opacity: 1.0});
+					}, 1000);
+				}
+						
+				else
+				{
+					$.modaldialog.error("No sites available!");
+					var mapErrorMessage = "<div style='position:relative;top:35%;' align='center'> <h3 align='center' style='text-align:center;align:center;color:#3B0B0B;'>No contents available</h3> <img src='css/images/error.png' alt='Error' height='60' width='60' style='margin:auto;display:block;vertical-align:middle;'><a href='#' style='width:100px;margin:auto;display:block;vertical-align:middle;align:center;' align='center' data-role='button' data-mini='true' data-inline='true' onclick='getPointsAgain();'>Reload sites</a></div>";
+					$('#trailListings').html(mapErrorMessage);
+					$('#trailListings').trigger('create');
+				}
+			
+			}
+			
+			else
+			{
+				if (window.localStorage.getItem("trailpointsData")!=null)
+				{
+					var storedData = JSON.parse(window.localStorage.getItem("trailpointsData"));
+					$('#trailListings').html(storedData.listings);
+					$('#trailListings').trigger('create');
+							 
+					$('#trailPointsPage').after(storedData.pages);
+				}
+						
+				else
+				{
+					$.modaldialog.error("No sites available!");
+					var mapErrorMessage = "<div style='position:relative;top:35%;' align='center'> <h3 align='center' style='text-align:center;align:center;color:#3B0B0B;'>No contents available</h3> <img src='css/images/error.png' alt='Error' height='60' width='60' style='margin:auto;display:block;vertical-align:middle;'><a href='#' style='width:100px;margin:auto;display:block;vertical-align:middle;align:center;' align='center' data-role='button' data-mini='true' data-inline='true' onclick='getPointsAgain();'>Reload sites</a></div>";
+					$('#trailListings').html(mapErrorMessage);
+					$('#trailListings').trigger('create');
+				}
+			}
+		}
+		
+		window.addEventListener("load", getTrailPoints, true);
+
+		function getPointsAgain()
+		{
+			jQuery.support.cors = true;
+			$.ajax({
+				url: '../getTrailPoints.php',
+				crossDomain: true,
+				type: 'post',
+				data: '', 
+				timeout: 6000,
+				success: function(data)
+				{
+					if(window.localStorage.getItem("trailpointsData")!=null)
+					{
+						window.localStorage.removeItem("trailpointsData");
+					}
+					window.localStorage.setItem("trailpointsData", JSON.stringify(data));
+					window.location.reload();	
+				},
+				error: function()
+				{
+					$.modaldialog.error("Sites could not be retrived!");
+				}
+			});
+		}
+		
+		
+		function hideAndShow() 
+		{
+			$('body').css({visibility:'hidden'});
+			$('body').css({opacity: 0.0});
+			setTimeout(function()
+			{
+				$('body').css({visibility:'visible', opacity: 0.0}).animate({opacity: 1.0});
+			}, 50);
+		}
+		
+		window.addEventListener("orientationchange", hideAndShow, false);
+		window.addEventListener("resize", hideAndShow);
+		window.addEventListener("beforeunload", function()
+		{
+			window.localStorage.setItem("url", document.URL);
+		});
+		
+		document.addEventListener("offline", function(){
+			if(!navigator.onLine)
+				$.modaldialog.warning("No connection found. Switching to offline mode...");});
+
+</script>
+
+
+  <div data-role="header" data-position="fixed">
+    <a class='toLoad' href="index.html" rel="external" data-icon="home" data-role="button" data-transition="flip" >Home</a>
+	<h1> Sites</h1>
+	<!--<a class='toLoad' href="welcome.html" onClick="window.localStorage.setItem('loggedin', 'false');" data-icon="delete" data-role="button" data-transition="flip" >Logout</a>-->
+	
+	<div data-role="navbar" data-iconpos="right">
+      <ul>
+        <li><a class='toLoad' href="trailmap.html" rel="external" data-icon="location2" data-iconpos="bottom" data-transition="flip" >Map</a></li>
+        <li><a href="#" data-icon="info" data-iconpos="bottom" data-transition="flip" class="ui-btn-active ui-state-persist" >Sites</a></li>
+        <li><a class='toLoad' href="appquests.html" rel="external" data-icon="navigation" data-iconpos="bottom" data-transition="flip" >Tours</a></li>
+      </ul>
+    </div>
+	
+  </div><!-- /header -->
+
+  <div data-role="content"> 
+	
+    <div id="trailListings" class="ui-body" style='position: relative;' >
+		<!--Content generated with javascript code-->
+		<h3 align="center" style="text-align:center;align:center;color:#3B0B0B;">Loading...</h3>
+		<img src="css/images/loader.gif" alt="Loading..." height="60" width="60" style="margin:auto;display:block;vertical-align:middle;">
+    </div>
+	
+  </div><!-- /content -->
+
+  <div data-role="footer" data-position="fixed">
+	<h1>Open Virtual Worlds Group</h1>
+  </div>
+
+</div><!-- /page -->
+
+</body>
+</html>

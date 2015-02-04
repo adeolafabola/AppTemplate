@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html manifest='cache.manifest' style='background-image:url(css/images/backgroundmap.jpg);background-size: cover;'>
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+	<script type="text/javascript" src="detector.js"></script>
+	
+	<link rel="stylesheet" href="css/jquery.mobile-1.3.1.css" />
+	<script type="text/javascript" src="js/jquery-1.11.1.js"></script>
+	<script type="text/javascript" src="js/jquery.mobile-1.3.1.min.js"></script>
+
+	<script type="text/javascript" src="js/jquery.modaldialog.js"></script>
+	<script type="text/javascript" src="js/prettify.js"></script>
+
+	<link rel="stylesheet" href="css/jquery.modaldialog.css" />
+	<link rel="stylesheet" href="css/prettify.css" />
+	
+	<style>
+		#loadingOverlay {
+			position: fixed;
+			left: 0;
+			top: 0;
+			bottom: 0;
+			right: 0;
+			background: #000;
+			opacity: 0.5;
+			filter: alpha(opacity=50);
+			z-index: 10000000000000;
+		}
+		#loadingGif {
+			width: 50px;
+			height: 50px;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			margin: -28px 0 0 -25px;
+			opacity: 0.99;
+			filter: alpha(opacity=99);
+		}
+		#loadingText {
+			color: white;
+			position: absolute;
+			top: 45%;
+			left: 50%;
+			margin: -28px 0 0 -25px;
+			opacity: 0.99;
+		}
+	</style>
+	
+	<script type='text/javascript'>
+		var loading;
+		
+		$(function addLoadingOverlay() 
+		{
+			loading = function() 
+			{
+				// add the overlay with loading image to the page
+				var overlay = '<div id="loadingOverlay">' 
+				+ '<p id="loadingText">Loading...</p>'
+				+ '<img id="loadingGif" src="css/images/loader.gif">' 
+				+ '</div>';
+				
+				$(overlay).appendTo('body');
+				
+				/*
+				// click on the overlay to remove it
+				$('#loadingOverlay').click(function() {
+					$(this).remove();
+				});
+				*/
+			};
+			
+			//$('a').click(loading);	//clicking any link opens the overlay
+			//$('a').bind('click', loading);	//clicking any link opens the overlay
+			$('.toLoad').bind('click', loading);	//clicking any link opens the overlay
+						
+			$('body').bind("pagechange", function(toPage, ui) 
+			{
+				$('#loadingOverlay').remove();
+			});
+			
+			$('body').bind("pagebeforeshow", function()
+			{
+				loading();
+				$('body').bind("pageshow", function()
+				{
+					$('#loadingOverlay').remove();
+				});
+			});
+
+		});
+	</script>
+
+	<title>[[App Name]] | Login</title>
+</head>
+
+<body>
+
+<div style='background-image:url(css/images/scroll.jpg);background-size: 100% 100%; position:fixed; z-index: -999; bottom: 0%; left: 0; width: 100%; height: 100%;'>
+	<div style="position:relative;top:40%;" align='center'>
+		<img align="center" src="css/images/loader.gif" alt=" " height="60" width="60" style="margin:auto;display:block;vertical-align:middle;">
+	</div>
+</div>
+
+<div id="loginPage" style='background-image:url(css/images/scroll.jpg);background-size: 100% 100%;' data-role="page" data-dom-cache='false'>
+
+<div data-role="header" data-position="fixed">
+<a class='toLoad' href="welcome.html" data-icon="home" data-transition="flip" >Back</a>
+<h1>Welcome to [[App Name]]</h1>
+</div>
+
+<div data-role="content" class="ui-content">   
+    <div id="landmark-1" data-landmark-id="1">
+	
+	<div align="center">
+		<h3 style="color:#3B0B0B;">Login with your details</h3>
+		<img src="css/images/logo.jpg" width='30%'>
+	</div>
+
+	
+    <form data-ajax="false" id="loginForm" method="post" action="login.php">
+    <div data-role="fieldcontain" class="ui-hide-label">
+        <label for="username">Username:</label>
+        <input type="text" required name="username" id="username" value="" placeholder="Username" />
+    </div>
+
+    <div data-role="fieldcontain" class="ui-hide-label">
+        <label for="password">Password:</label>
+        <input type="password" required name="password" id="password" value="" placeholder="Password" />
+    </div>
+
+    <input type="submit" value="Login" id="submitButton">
+    </form>
+</div>  
+</div>
+
+<div data-role="footer" data-position="fixed">
+    <h4>Open Virtual Worlds Group</h4>
+</div>
+
+<script type="text/javascript" src="js/jquery.h5validate.js"></script>
+
+<script>
+
+			$(document).ready(function(){
+				 $('#loginForm').h5Validate();
+				 
+				 if(window.localStorage.getItem("username")!=null)
+				 {
+					 $('#username').val(window.localStorage.getItem("username"));
+				 }	  
+				 
+			});
+			
+			$('#loginForm').submit(function(event){
+			 event.preventDefault();
+			 jQuery.support.cors = true; 
+			 $.ajax({ 
+				 url: '../login.php',
+				 crossDomain: true,
+				 type: 'post',
+				 data: $("#loginForm").serialize(), 
+				 timeout: 6000,
+				 success: function(data)
+				 {
+					 if(data.status == 'success')
+					 {
+						 window.localStorage.setItem("username", $('#username').val());
+						 window.localStorage.setItem("loggedin", "true");
+						 
+							if(window.localStorage.getItem("urlToGo")!=null)
+							{
+								window.location.href = window.localStorage.getItem("urlToGo"); 
+								window.localStorage.removeItem("urlToGo");
+								
+							}
+							
+							else
+							{
+								window.location.href = 'trailmap.html'; 
+							}
+						 
+					 }
+					 else if(data.status == 'error')
+					 {
+						 $.modaldialog.error("Invalid username and/or password!");
+						 clear();
+						 return false;        
+					 }
+					 else if(data.status == 'invalid')
+					 {
+						 $.modaldialog.warning("Username and password fields cannot be empty!");
+						 return false;        
+					 }
+
+				 },
+				 error: function()
+				 {
+					$.modaldialog.error("Oops, something went wrong. Please try again!");		 
+				 }
+			 }); 
+
+			 });
+			 
+			 function clear() 
+			 {
+			 
+				$("#loginForm :input").each( function() {
+					  $(this).val("");
+				});
+			 
+			 }
+			 
+		
+		function hideAndShow() 
+		{
+			$('body').css({visibility:'hidden'});
+			$('body').css({opacity: 0.0});
+			setTimeout(function()
+			{
+				$('body').css({visibility:'visible', opacity: 0.0}).animate({opacity: 1.0});
+			}, 50);
+			
+			/*
+			$('body').css({'opacity':0});
+			setTimeout(function()
+			{
+				$('body').animate({'opacity':1});
+			}, 50);
+			*/
+			
+			/*
+			$('body').hide();
+			setTimeout(function()
+			{
+				$('body').fadeIn();
+			}, 50);
+			*/
+		}
+		
+		//window.addEventListener("orientationchange", hideAndShow, false);
+		//window.addEventListener("resize", hideAndShow);
+		
+			 
+			window.addEventListener("beforeunload", function()
+			{
+				window.localStorage.setItem("url", document.URL);
+			});
+			 
+			document.addEventListener("offline", function(){
+				if(!navigator.onLine)
+					$.modaldialog.warning("No connection found. Switching to offline mode...");});
+
+</script>
+
+</div>
+
+</body>
+</html>

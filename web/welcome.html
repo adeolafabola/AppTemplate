@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html manifest='cache.manifest' style='background-image:url(css/images/backgroundmap.jpg);background-size: cover;'>
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+	<script type="text/javascript" src="detector.js"></script>
+	
+	<link rel="stylesheet" href="css/jquery.mobile-1.3.1.css" />
+	<script type="text/javascript" src="js/jquery-1.11.1.js"></script>
+	<script type="text/javascript" src="js/jquery.mobile-1.3.1.min.js"></script>
+	
+	<script type="text/javascript" src="js/jquery.modaldialog.js"></script>
+	<script type="text/javascript" src="js/prettify.js"></script>
+
+	<link rel="stylesheet" href="css/jquery.modaldialog.css" />
+	<link rel="stylesheet" href="css/prettify.css" />
+	
+
+	<style>
+		#loadingOverlay {
+			position: fixed;
+			left: 0;
+			top: 0;
+			bottom: 0;
+			right: 0;
+			background: #000;
+			opacity: 0.5;
+			filter: alpha(opacity=50);
+			z-index: 10000000000000;
+		}
+		#loadingGif {
+			width: 50px;
+			height: 50px;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			margin: -28px 0 0 -25px;
+			opacity: 0.99;
+			filter: alpha(opacity=99);
+		}
+		#loadingText {
+			color: white;
+			position: absolute;
+			top: 45%;
+			left: 50%;
+			margin: -28px 0 0 -25px;
+			opacity: 0.99;
+		}
+	</style>
+	
+	<script type='text/javascript'>
+		var loading;
+		
+		$(function addLoadingOverlay() 
+		{
+			loading = function() 
+			{
+				// add the overlay with loading image to the page
+				var overlay = '<div id="loadingOverlay">' 
+				+ '<p id="loadingText">Loading...</p>'
+				+ '<img id="loadingGif" src="css/images/loader.gif">' 
+				+ '</div>';
+				
+				$(overlay).appendTo('body');
+				
+				/*
+				// click on the overlay to remove it
+				$('#loadingOverlay').click(function() {
+					$(this).remove();
+				});
+				*/
+			};
+			
+			//$('a').click(loading);	//clicking any link opens the overlay
+			//$('a').bind('click', loading);	//clicking any link opens the overlay
+			$('.toLoad').bind('click', loading);	//clicking any link opens the overlay
+						
+			$('body').bind("pagechange", function(toPage, ui) 
+			{
+				$('#loadingOverlay').remove();
+			});
+			
+			$('body').bind("pagebeforeshow", function()
+			{
+				loading();
+				$('body').bind("pageshow", function()
+				{
+					$('#loadingOverlay').remove();
+				});
+			});
+
+		});
+	</script>
+	
+	
+	<title>[[App Name]] | Welcome </title>
+</head>
+
+<body>
+
+<div style='background-image:url(css/images/scroll.jpg);background-size: 100% 100%; position:fixed; z-index: -999; bottom: 0%; left: 0; width: 100%; height: 100%;'>
+	<div style="position:relative;top:40%;" align='center'>
+		<img align="center" src="css/images/loader.gif" alt=" " height="60" width="60" style="margin:auto;display:block;vertical-align:middle;">
+	</div>
+</div>
+
+<div id="welcomePage" style='background-image:url(css/images/scroll.jpg);background-size: 100% 100%;' data-role="page" data-dom-cache='false'>
+<script>
+
+		function hideAndShow() 
+		{
+			$('body').css({visibility:'hidden'});
+			$('body').css({opacity: 0.0});
+			setTimeout(function()
+			{
+				$('body').css({visibility:'visible', opacity: 0.0}).animate({opacity: 1.0});
+			}, 50);
+			
+			/*
+			$('body').css({'opacity':0});
+			setTimeout(function()
+			{
+				$('body').animate({'opacity':1});
+			}, 50);
+			*/
+			
+			/*
+			$('body').hide();
+			setTimeout(function()
+			{
+				$('body').fadeIn();
+			}, 50);
+			*/
+		}
+		
+		window.addEventListener("orientationchange", hideAndShow, false);
+		window.addEventListener("resize", hideAndShow);
+		
+
+document.addEventListener("offline", function(){
+	if(!navigator.onLine)
+		$.modaldialog.warning("No connection found. Switching to offline mode...");});
+		
+window.addEventListener("beforeunload", function()
+		{
+			window.localStorage.setItem("url", document.URL);
+		});
+</script>
+
+<div data-role="header" data-position="fixed">
+	<a class='toLoad' href="index.html" rel="external" data-icon="home" data-role="button" data-transition="flip" >Home</a>
+	<h1>Welcome to [[App Name]]</h1>
+</div>
+
+<div data-role="content" class="ui-content">   
+    <div id="landmark-1" data-landmark-id="1">
+	
+	<div align="center">
+		<h2 style="color:#3B0B0B;">Welcome to [[App Name]]</h2>
+		<img src="css/images/logo.jpg" width='30%'>
+	</div>
+	
+	<div data-role="fieldcontain" class="ui-hide-label">
+		<a class='toLoad' href="login.html" rel='external' data-role="button" data-transition="flip" >Login with your authentication details</a>
+			<div align="center"><h2 style="color:#3B0B0B;">OR</h2></div>
+		<a class='toLoad' href="register.html" rel='external' data-role="button" data-transition="flip" >Sign Up for a new account</a>    
+	</div>
+</div>  
+</div>
+
+<div data-role="footer" data-position="fixed">
+    <h4>Open Virtual Worlds Group</h4>
+</div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html manifest='cache.manifest' style='background-image:url(css/images/backgroundmap.jpg);background-size: cover;'>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		<script type="text/javascript" src="detector.js"></script>
+		
+		<link rel="stylesheet" href="css/jquery.mobile-1.3.1.css" />
+		
+		<script type="text/javascript" src="js/jquery-1.11.1.js"></script>
+		<script type="text/javascript" src="js/jquery-1.6.1.min.js"></script>
+		<script type="text/javascript" src="js/jquery.mobile-1.3.1.min.js"></script>
+	
+		<script type="text/javascript" src="js/simple-inheritance.min.js"></script>
+		<script type="text/javascript" src="js/jquery.animate-enhanced.min.js"></script>
+		<script type="text/javascript" src="js/code-photoswipe-jQuery-1.0.11.min.js"></script>
+		
+		<script type="text/javascript" src="js/jquery.modaldialog.js"></script>
+		<script type="text/javascript" src="js/prettify.js"></script>	
+	
+		<link rel="stylesheet" href="css/jquery.modaldialog.css" />
+		<link rel="stylesheet" href="css/prettify.css" />
+		
+		<link href="css/photoswipe.css" type="text/css" rel="stylesheet" />
+				
+		<title>[[App Name]] | Splash </title>
+		
+		<script type="text/javascript">
+			
+			jQuery.support.cors = true;
+			function makeCalls()
+			{
+				if (localStorage.getItem('trials')==null)
+				{
+					localStorage.setItem('trials', 0);
+				}
+				var timeoutVal = 30000+(localStorage.getItem('trials')*10000);
+				
+				$(document).ready(function()
+				{
+					$.when(
+						$.ajax({
+							url: '../getTrailCoordinates.php',
+							crossDomain: true,
+							type: 'post',
+							data: '', 
+							timeout: timeoutVal,
+							success: function(data)
+							{
+								if(window.localStorage.getItem("trailmapData")!=null)
+								{
+									window.localStorage.removeItem("trailmapData");
+								}
+								window.localStorage.setItem("trailmapData", JSON.stringify(data));		
+								
+								//alert('Loaded map coordinates');	
+							},
+							error: function()
+							{
+								//$.modaldialog.error("Map coordinates could not be retrived!");
+							}
+							
+						}),
+						$.ajax({
+							url: '../getTrailPoints.php',
+							crossDomain: true,
+							type: 'post',
+							data: '', 
+							timeout: timeoutVal,
+							success: function(data)
+							{
+								if(window.localStorage.getItem("trailpointsData")!=null)
+								{
+									window.localStorage.removeItem("trailpointsData");
+								}
+								window.localStorage.setItem("trailpointsData", JSON.stringify(data));	
+								
+								//alert('Loaded sites');
+							},
+							error: function()
+							{
+								//$.modaldialog.error("Sites could not be retrived!");
+							}
+						}),
+						$.ajax({
+							url: '../getQuests.php',
+							crossDomain: true,
+							type: 'post',
+							data: '', 
+							timeout: timeoutVal,
+							success: function(data)
+							{
+								if(window.localStorage.getItem("appquestsData")!=null)
+								{
+									window.localStorage.removeItem("appquestsData");
+								}
+								window.localStorage.setItem("appquestsData", JSON.stringify(data));
+							},
+							
+							error: function()
+							{
+								//$.modaldialog.error("Tours could not be retrived!");
+							}		
+						})
+					).then( 
+							function()	//contents successfully loaded
+							{
+								localStorage.setItem('trials', 0);
+								$.modaldialog.success('Contents fully loaded. Initialising App...');	//redirect here
+								setTimeout(function()
+								{
+									window.location.href ='index.html';
+								}, 2000);
+								
+							},
+							
+							function() //contents failed to load
+							{
+								localStorage.setItem('trials', localStorage.getItem('trials')+1);
+								if(window.localStorage.getItem("trailmapData")!=null
+									&& window.localStorage.getItem("trailpointsData")!=null)	//some old data exists in local storage
+								{
+									$.modaldialog.warning('Contents not fully loaded. Initialising App with saved data...');	//redirect here
+								
+									setTimeout(function()
+									{
+										window.location.href ='index.html';
+									}, 2000);
+								}
+								
+								else	//not enough data for app to function
+								{
+									if (confirm('Contents not fully loaded. Failed to initialise App. Retry?')) 
+									{
+										window.location.reload();
+									}
+									
+									else
+									{
+										$.modaldialog.error("App not initialised. Closing...");
+			
+										setTimeout(function()
+										{
+											navigator.app.exitApp();
+										}, 3000);
+									}
+								}
+								
+							});
+				});
+			    
+			}
+
+			window.addEventListener("load", makeCalls, false);
+			
+			
+		</script>
+
+	</head>
+
+	<body style='position: fixed; overflow:hidden;width:100%; height:100%;'>
+	
+		<div style='position: fixed; width:100%; height:100%; overflow:hidden; background-image:url(css/images/backgroundmap.jpg);background-size: cover;'>
+			
+		</div>
+		
+	</body>
+	
+</html>

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html manifest='cache.manifest' style='background-image:url(css/images/backgroundmap.jpg);background-size: cover;'>
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+	<script type="text/javascript" src="detector.js"></script>
+	
+	<link rel="stylesheet" href="css/jquery.mobile-1.3.1.css" />
+	<script type="text/javascript" src="js/jquery-1.11.1.js"></script>
+	<script type="text/javascript" src="js/jquery.mobile-1.3.1.min.js"></script>
+	
+	<script type="text/javascript" src="js/jquery.modaldialog.js"></script>
+	<script type="text/javascript" src="js/prettify.js"></script>
+
+	<link rel="stylesheet" href="css/jquery.modaldialog.css" />
+	<link rel="stylesheet" href="css/prettify.css" />
+		
+		
+	<style>
+		#loadingOverlay {
+			position: fixed;
+			left: 0;
+			top: 0;
+			bottom: 0;
+			right: 0;
+			background: #000;
+			opacity: 0.5;
+			filter: alpha(opacity=50);
+			z-index: 10000000000000;
+		}
+		#loadingGif {
+			width: 50px;
+			height: 50px;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			margin: -28px 0 0 -25px;
+			opacity: 0.99;
+			filter: alpha(opacity=99);
+		}
+		#loadingText {
+			color: white;
+			position: absolute;
+			top: 45%;
+			left: 50%;
+			margin: -28px 0 0 -25px;
+			opacity: 0.99;
+		}
+	</style>
+	
+	<script type='text/javascript'>
+		var loading;
+		
+		$(function addLoadingOverlay() 
+		{
+			loading = function() 
+			{
+				// add the overlay with loading image to the page
+				var overlay = '<div id="loadingOverlay">' 
+				+ '<p id="loadingText">Loading...</p>'
+				+ '<img id="loadingGif" src="css/images/loader.gif">' 
+				+ '</div>';
+				
+				$(overlay).appendTo('body');
+				
+				/*
+				// click on the overlay to remove it
+				$('#loadingOverlay').click(function() {
+					$(this).remove();
+				});
+				*/
+			};
+			
+			//$('a').click(loading);	//clicking any link opens the overlay
+			//$('a').bind('click', loading);	//clicking any link opens the overlay
+			$('.toLoad').bind('click', loading);	//clicking any link opens the overlay
+						
+			$('body').bind("pagechange", function(toPage, ui) 
+			{
+				$('#loadingOverlay').remove();
+			});
+			
+			$('body').bind("pagebeforeshow", function()
+			{
+				loading();
+				$('body').bind("pageshow", function()
+				{
+					$('#loadingOverlay').remove();
+				});
+			});
+			
+			
+			$('.imageMapLink').bind('click', function()
+			{
+				var thisElement = $(this);
+				thisElement.css({ boxShadow: '3px 3px 20px 3px gold' });
+				//thisElement.css({ display: 'block' });
+				setTimeout(function()
+				{
+					thisElement.css({ boxShadow: 'none' });
+				}, 200);
+			});
+
+		});
+	</script>
+	
+	<title>[[App Name]] | Splash </title>
+</head>
+
+<body>
+
+<div style='background-image:url(css/images/backgroundmap.jpg);background-size: cover; position:fixed; z-index: -999; bottom: 0%; left: 0; width: 100%; height: 100%;'>
+	<div style="position:relative;top:40%;" align='center'>
+		<img align="center" src="css/images/loader.gif" alt=" " height="60" width="60" style="margin:auto;display:block;vertical-align:middle;">
+	</div>
+</div>
+
+<div id="splashPage" style='background-image:url(css/images/backgroundmap.jpg);background-size: cover;' data-fullscreen="true" data-role="page" data-dom-cache='false'>
+			
+<script>
+		function resizeBackgroundImage()
+		{
+			var windowOrientation="portrait";
+			var backgroundHolderWidth = $(window).width();
+			
+			if($(window).width()>$(window).height())
+				windowOrientation='landscape';
+			else
+				windowOrientation='portrait';
+			
+			var signpostsHeight = $(window).height()*0.7;
+			
+
+			
+			if (windowOrientation=="landscape")
+			{
+				backgroundHolderWidth = $(window).width();
+				signpostsHeight = $(window).height()*0.85;
+			
+				var images = document.getElementsByClassName('bckImg');
+				var i = images.length;
+
+				while(i--) 
+				{
+					images[i].style.width = backgroundHolderWidth+"px";
+					images[i].style.marginLeft = 'auto';
+				}
+			}
+			
+			else if (windowOrientation=="portrait")
+			{
+				backgroundHolderWidth = $(window).height()*1.5;
+				signpostsHeight = $(window).height()*0.7;
+			
+				var images = document.getElementsByClassName('bckImg');
+				var i = images.length;
+
+				while(i--) 
+				{
+					images[i].style.width = backgroundHolderWidth+"px";
+					images[i].style.marginLeft = '-30%';
+				}
+			}
+		    
+			var signposts = document.getElementById('signposts');
+
+			signposts.style.height = signpostsHeight+"px";	
+			
+		}
+		
+		function changeBackgroundImage()
+		{
+			$("[data-position='fixed']").fixedtoolbar('hide');
+			
+			var backgroundImage = document.getElementById('backgroundImage');
+			var imageArray = ["css/images/backgroundmap.jpg"];
+			
+			var j=0;
+			setInterval(function() {
+			backgroundImage.src = imageArray[j++];
+			if(j>=imageArray.length)
+				j=0;
+			}, 10*1000);
+		}
+		
+		function navigate(link)
+		{
+			if(window.localStorage.getItem("loggedin")==null)
+			{
+				window.location.href = link.getAttribute("href");//anything clicked takes effect
+				
+				/*
+				window.localStorage.setItem("urlToGo", link.getAttribute("href"));
+				window.location.href ="welcome.html"; //anything clicked redirects to welcome.html	
+				*/				
+			}
+			
+			else if(window.localStorage.getItem("loggedin")=="false")
+			{
+				window.location.href = link.getAttribute("href");//anything clicked takes effect
+				/*
+				window.localStorage.setItem("urlToGo", link.getAttribute("href"));
+				window.location.href ="login.html";//anything clicked redirects to login.html
+				//username field has already been set
+				*/
+			
+			}
+
+			else if(window.localStorage.getItem("loggedin")=="true")
+			{
+				window.location.href = link.getAttribute("href");//anything clicked takes effect
+				//username field has already been set
+			}
+		}
+
+		
+		window.addEventListener("load", resizeBackgroundImage, false);
+		//window.addEventListener("load", changeBackgroundImage, false);
+		window.addEventListener("orientationchange", resizeBackgroundImage, false);
+		window.addEventListener("resize", resizeBackgroundImage, false);
+		
+		document.addEventListener("offline", function(){
+			if(!navigator.onLine)
+				$.modaldialog.warning("No connection found. Switching to offline mode...");});
+
+
+		function exitApp()
+		{
+			var confirmExit;
+			
+			if(window.applicationCache.status == window.applicationCache.DOWNLOADING)
+			{
+				confirmExit = confirm("New contents are being downloaded and progress will be lost. Exit anyway?");
+			}
+			
+			else
+			{
+				confirmExit = confirm("Exit App?");
+			}
+
+			if(confirmExit==true)
+			{
+
+				$.modaldialog.success("Thank you for using the [[App Name]]. Goodbye!");
+				//window.localStorage.clear(); Instead of clearing localStorage, set 'loggedin' to false
+				window.localStorage.setItem('loggedin', 'false');
+				navigator.app.exitApp();
+			}
+			
+			else
+			{
+				
+			}
+		}
+
+		function hideAndShow() 
+		{
+			$('body').css({visibility:'hidden'});
+			$('body').css({opacity: 0.0});
+			setTimeout(function()
+			{
+				$('body').css({visibility:'visible', opacity: 0.0}).animate({opacity: 1.0});
+			}, 50);
+			
+			/*
+			$('body').css({'opacity':0});
+			setTimeout(function()
+			{
+				$('body').animate({'opacity':1});
+			}, 50);
+			*/
+			
+			/*
+			$('body').hide();
+			setTimeout(function()
+			{
+				$('body').fadeIn();
+			}, 50);
+			*/
+		}
+		
+		window.addEventListener("orientationchange", hideAndShow, false);
+		window.addEventListener("resize", hideAndShow);
+
+		
+		
+
+window.addEventListener("beforeunload", function()
+{
+	window.localStorage.setItem("url", document.URL);
+});
+
+</script>
+
+
+<div data-role="header" data-position="fixed">
+    <!--<a href="#" data-icon="delete" data-role="button" onclick="exitApp()" data-transition="flip">Exit</a>-->
+	<h1>[[App Name]]</h1>
+</div>
+
+<div data-role="content" class="ui-content">   
+	
+	<div style='margin:0; height:100%;overflow:hidden;position:fixed;' class="bckImg" id="backgroundHolder" align="center">
+		<!--<img style="z-index:-1;" class="bckImg" id ="backgroundImage" src="css/images/backgroundmap.jpg" align='center'>-->
+		<img style="position:fixed;bottom:-5%;z-index:1;left:40%;" id="signposts" src="css/images/signposts.png" usemap="#signpostmap">
+		
+		<map id="signpostmap" name="signpostmap">
+			<area class='toLoad imageMapLink' shape="rect" coords="11, 64, 286, 190" onClick="navigate(this);return false;" title=" Map" alt=" Map" href="trailmap.html" target="_self" />
+			<area class='toLoad imageMapLink' shape="rect" coords="5, 243, 282, 365" onClick="navigate(this);return false;" title=" Sites" alt=" Sites" href="trailpoints.html" target="_self" />
+			<area class='toLoad imageMapLink' shape="rect" coords="3, 430, 284, 543" onClick="navigate(this);return false;" title=" Tours" alt=" Tours" href="appquests.html" target="_self"/>
+			<area class='toLoad imageMapLink' shape="rect" coords="52, 613, 242, 689" onClick="navigate(this);return false;" title="About App" alt="About App" href="about.html" target="_self" />
+		</map>
+	
+	</div>
+	
+	
+</div>
+
+
+<script type="text/javascript">
+	function listeners(b)
+	{
+		window.addEventListener("load", b, false);
+		window.addEventListener("orientationchange", b, false);
+		window.addEventListener("resize", b, false);
+	}
+	
+	!function(){"use strict";function a(){function a(){function a(a){function c(a){return a*b[1===(d=1-d)?"width":"height"]}var d=0;return a.split(",").map(Number).map(c).map(Math.floor).join(",")}for(var b={width:h.width/i.width,height:h.height/i.height},c=0;f>c;c++)e[c].coords=a(g[c])}function b(){i.onload=function(){(h.width!==i.width||h.height!==i.height)&&a()},i.src=h.src}function c(){function b(){clearTimeout(j),j=setTimeout(a,250)}window.addEventListener?listeners(b):window.attachEvent&&window.attachEvent("onload",b)}var d=this,e=d.getElementsByTagName("area"),f=e.length,g=Array.prototype.map.call(e,function(a){return a.coords}),h=document.querySelector('img[usemap="#'+d.name+'"]'),i=new Image,j=null;b(),c()}window.imageMapResize=function(b){function c(b){if("MAP"!==b.tagName)throw new TypeError("Expected <MAP> tag, found <"+b.tagName+">.");a.call(b)}Array.prototype.forEach.call(document.querySelectorAll(b||"map"),c)},"jQuery"in window&&(jQuery.fn.imageMapResize=function(){return this.filter("map").each(a)})}();
+	imageMapResize();
+</script>
+
+
+<div data-role="footer" data-position="fixed">
+    <h4>Open Virtual Worlds Group</h4>
+</div>
+</div>
+
+</body>
+</html>
